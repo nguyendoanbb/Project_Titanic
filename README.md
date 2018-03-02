@@ -1,4 +1,7 @@
 # Project_Titanic
-R Code for Titanic Dataset
+# Analyze survival rate of passenger from Titanic accident
 
-Some changes were made for better analysis and treatment of missing values
+# Download 2 datasets train.csv and test.csv
+
+# Run code from file Code
+
