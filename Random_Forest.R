@@ -1,4 +1,4 @@
-Nguyen Doan
+#Nguyen Doan
 #Topic: Analyze survival rate of passengers from Titanic accident
 #Number of observation: 3128
 #Variables: PassengerID, SurvivedID, Passenger Class, Name, Sex, Age, 
@@ -22,7 +22,7 @@ library('randomForest') # classification algorithm
 #setting full dataset
 
 rm(list=ls()) #clear current R environment
-setwd("~/Downloads/") #need to modify to directory that contains the dataset
+setwd("~/Documents/Github/Project_Titanic") #need to modify to directory that contains the dataset
 
 train <- read.csv('train.csv', stringsAsFactors = F)
 test  <- read.csv('test.csv', stringsAsFactors = F)
@@ -140,13 +140,12 @@ full$Mother <- factor(full$Mother)
 md.pattern(full) #investigate NA/missing values
 
 #re-create train and test dataset after manipulating full dataset
-train = sample(1:nrow(full), nrow(full)*2/3)
-final.train = full[train,]
-final.test = full[-train,]
+train <- full[1:891,]
+test <- full[892:1309,]
 rf_model <- randomForest(factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch + 
                            Fare + Embarked + Title + 
                            FsizeD + Child + Mother,
-                         data = final.train)
+                         data = train)
 
 plot(rf_model, ylim=c(0,0.36))
 legend('topright', colnames(rf_model$err.rate), col=1:3, fill=1:3)
@@ -175,7 +174,18 @@ ggplot(rankImportance, aes(x = reorder(Variables, Importance) ,
   theme_few()
 
 prediction <- predict(rf_model, test)
+table(prediction)
 solution <- data.frame(PassengerID = test$PassengerId, Survived = prediction)
-solution
-View(full)
 
+'
+library(e1071)
+train.svm <- svm(as.factor(Survived)~., data=train, 
+                 kernel = 'radial', gamma = 1, cost =1)
+
+test$Survived <- as.factor(test$Survived)
+test$Survived <- factor(test$Survived, levels = c(1,2))
+predict.svm <- predict(train.svm, test[,-2])
+predict.svm <- as.vector(predict.svm)
+predict.svm <- as.factor(predict.svm)
+table(Truth = as.factor(train$Survived), Predicted = predict.svm)
+'
